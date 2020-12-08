@@ -66,7 +66,7 @@ S1 = sum((round_apgar <= 9)*1)
 med_S1 = sum(((round_apgar <= 9)*round_apgar))/S1
 
 ### Plot percentage
-
+library(ggplot2)
 cl = c('N','M','O','S')
 Type = c('Individual','Individual','Individual','Individual','Familiar','Familiar','Familiar','Familiar')
 per1 = c(N,L,M,S)/length(Qt)*100
@@ -74,15 +74,12 @@ per2 = c(N1,L1,M1,S1)/length(round_apgar)*100
 Taxonomy = c(cl,cl)
 Percentage = c(per1,per2)
 datf <- data.frame(Percentage, Taxonomy, Type)
+Taxonomy2 = factor(datf$Taxonomy, cl)
 
-ggplot(data=datf, aes(x=Taxonomy, y=Percentage, fill=Type)) +
-  geom_bar(stat="identity", color="black", position=position_dodge())+
+ggplot(data=datf, aes(x=Taxonomy2, y=Percentage, fill=Type)) + 
+  labs(y="Percentage", x = "Taxonomy") + geom_bar(stat="identity", color="black", position=position_dodge())+
   theme_minimal()
-# Use custom colors
-p + scale_fill_manual(values=c('#999999','#E69F00'))
-# Use brewer color palettes
-p + scale_fill_brewer(palette="Blues")
-  
+
 
 # ANOVA
 Ni = ((Qt >= 17)*1)
@@ -113,12 +110,10 @@ levels(df$Class) <- c("Ni","Mi","Oi","Si","Nf","Mf","Of","Sf")
 ggboxplot(df, x = "Class", y = "vec1", 
           color = "Class", palette = c("#00AFBB", "#E7B800", "#FC4E07","#D82E2E", "#00AFBB", "#E7B800", "#FC4E07","#D82E2E"),
           ylab = "APGAR Test Evaluation", xlab = "Dysfunctionality Degree", add = "jitter")
-
 df[, 'Class'] <- as.factor(df[, 'Class'])
 res.aov <- aov(vec1 ~ Class, data = df)
 summary(res.aov)
 #install.packages("multcomp")
-
 library(multcomp)
 summary(glht(res.aov, linfct = mcp(Class = "Tukey")))
 
